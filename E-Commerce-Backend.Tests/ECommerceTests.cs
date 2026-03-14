@@ -1,4 +1,4 @@
-// <copyright file="UnitTest1.cs" company="Cole Clark">
+// <copyright file="ECommerceTests.cs" company="Cole Clark">
 // Copyright (c) Cole Clark. Licensed under the MIT License.
 // </copyright>
 
@@ -15,5 +15,6 @@ public class UnitTest1
     [Fact]
     public void Test1()
     {
+        Assert.True(true);
     }
 }

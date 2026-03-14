@@ -1,6 +1,6 @@
 // <copyright file="GlobalUsings.cs" company="Cole Clark">
 // Copyright (c) Cole Clark. Licensed under the MIT License.
-// </copyright>\
+// </copyright>
 
 #pragma warning disable SA1200 // Using directive should appear within a namespace declaration
 

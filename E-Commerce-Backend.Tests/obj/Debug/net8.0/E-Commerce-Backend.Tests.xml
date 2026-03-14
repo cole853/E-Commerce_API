@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>E-Commerce-Backend.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:E_Commerce_Backend.Tests.UnitTest1">
+            <summary>
+            first test class.
+            </summary>
+        </member>
+        <member name="M:E_Commerce_Backend.Tests.UnitTest1.Test1">
+            <summary>
+            first test.
+            </summary>
+        </member>
+    </members>
+</doc>

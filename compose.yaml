@@ -1,0 +1,77 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: E-Commerce-db
+    environment:
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_DB: ${DB_NAME:-appdb}
+    ports:
+      - "${DB_PORT:-5432}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ecommercebackend:
+    image: ecommercebackend
+    build:
+      context: .
+      dockerfile: E-Commerce-Backend/Dockerfile
+    container_name: E-Commerce-backend
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${DB_NAME:-appdb};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres}"
+    ports:
+      - "${BACKEND_PORT:-5000}:8080"
+      - "${BACKEND_HTTPS_PORT:-5001}:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./E-Commerce-Frontend
+      dockerfile: Dockerfile
+    container_name: E-Commerce-frontend
+    ports:
+      - "${FRONTEND_PORT:-8080}:80"
+    depends_on:
+      - ecommercebackend
+    networks:
+      - app-network
+    environment:
+      - REACT_APP_API_URL=http://backend:8080
+
+  tests:
+    build:
+      context: .
+      dockerfile: E-Commerce-Backend.Tests/Dockerfile
+    container_name: E-Commerce-unit-tests
+    depends_on:
+      - postgres
+      - ecommercebackend
+    networks:
+      - app-network
+    environment:
+      ASPNETCORE_ENVIRONMENT: Testing
+      ConnectionStrings__DefaultConnection: "Host=postgres;Port=5432;Database=${DB_NAME:-appdb};Username=${DB_USER:-postgres};Password=${DB_PASSWORD:-postgres}"
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
